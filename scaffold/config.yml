@@ -1,0 +1,44 @@
+# ⚡️ Zap Config
+## Docs: https://zap.sx/docs
+
+# Site
+## The name of your site
+name: §name§Zapworth§
+
+# URL
+## Site URL: Your sites url, without the trailing slash
+url: §url§https://zapworth.example§
+## Site Root: If your site is in a subdirectory, set this to the directory path.
+## For example, if your site will be `https://zapworth.example/blog` set root
+## to `/blog/`
+root: §root§/§
+
+# Directories
+## Web Directory: Where the static files will be generated to
+webDir: §webDir§web§
+## Assets Directory:  Location for your source assets (css, imgs, js)
+assetsDir: §assetsDir§assets§
+## Content Directory: The source of your content markdown files
+contentDir: §contentDir§content§
+## Templates Directory: Your nunjuck templates
+templatesDir: §templatesDir§templates§
+
+# Content
+## Default Layout: The default template that all content will fallback to
+defaultLayout: §defaultLayout§index§
+## Date Format: The default format of dates when output
+dateFormat: §dateFormat§YYYY-MM-DD§
+## Time Format: The default format for time when output
+timeFormat: §timeFormat§HH:mm:ss§
+
+# Plugins (Coming Soon)
+## Extend the functionality of Zap with fancy plugins!
+# plugins:
+#   zap-example:
+#     some: config
+#     another: item
+
+# Custom
+## You can include any other properties here, and they will be accessible in all
+## templates. You can access any config option in any template using:
+## `{{ config.myConfigOption }}` (this also works in markdown files!)

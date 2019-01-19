@@ -1,5 +1,5 @@
-// NOTE: This file is used in development only
+// NOTE: This file is used for testing the app in development only
 
-import { run } from './src';
+import Zap from './src';
 
-run();
+Zap.run().catch(console.error);

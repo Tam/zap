@@ -27,12 +27,17 @@
     "url": "https://github.com/tam/zap.git"
   },
   "scripts": {
-    "go": "./node_modules/ts-node/dist/bin.js index.ts",
+    "zap": "ts-node index.ts",
     "prepack": "rm -rf lib && tsc"
   },
   "devDependencies": {
+    "@types/js-yaml": "^3.12.0",
     "@types/node": "^10.12.18",
+    "commander": "^2.19.0",
     "ts-node": "^7.0.1",
     "typescript": "^3.2.4"
+  },
+  "dependencies": {
+    "js-yaml": "^3.12.1"
   }
 }
