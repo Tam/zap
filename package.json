@@ -1,0 +1,38 @@
+{
+  "name": "@tam/zap",
+  "version": "0.0.1",
+  "description": "A static site generator with Nunjucks powered templating",
+  "keywords": [
+    "static",
+    "site",
+    "website",
+    "blog",
+    "cms"
+  ],
+  "homepage": "https://zap.sx",
+  "bugs": {
+    "url": "https://github.com/tam/zap/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Tam",
+    "url": "https://tam.sx"
+  },
+  "main": "./lib/index.js",
+  "bin": {
+    "zap": "./bin/zap"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tam/zap.git"
+  },
+  "scripts": {
+    "go": "./node_modules/ts-node/dist/bin.js index.ts",
+    "prepack": "rm -rf lib && tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^10.12.18",
+    "ts-node": "^7.0.1",
+    "typescript": "^3.2.4"
+  }
+}
