@@ -1,5 +1,5 @@
 ---
-title: Zapworth
+title: Zap
 feed: false
 ---
 

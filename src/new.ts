@@ -44,14 +44,12 @@ class New {
 		this._absPath = path.join(process.cwd(), _path);
 
 		// 2. Inquirer all the settings in the config file and write out
-		this._loadConfig();
-
 		await this.configureConfig();
-
 		this.writeConfig();
 
 		// 3. Create directories and copy other scaffold files
-		// TODO
+		this.createDirectories();
+		this.copyScaffold();
 	}
 
 	// Actions: Path
@@ -115,6 +113,8 @@ class New {
 	 * questions
 	 */
 	async configureConfig () : Promise<void> {
+		this._loadConfig();
+
 		const when = (answers : any) => answers._confirm;
 
 		const answers : any = await inquirer.prompt([
@@ -204,20 +204,60 @@ class New {
 		}
 
 		fs.writeFileSync(
-			path.join(this._absPath, 'config.yml'),
+			this._abs('config.yml'),
 			config
+		);
+	}
+
+	// Actions: Directories
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Creates the required directories
+	 */
+	createDirectories () : void {
+		// Web
+		this._createDir(this._config.webDir);
+
+		// Assets
+		this._createDir(this._config.assetsDir);
+
+		// Content
+		this._createDir(this._config.contentDir);
+
+		// Templates
+		this._createDir(this._config.templatesDir);
+	}
+
+	/**
+	 * Copies the content from the scaffold to the new site
+	 */
+	copyScaffold () : void {
+		// Copy Content
+		New._copyAll(
+			New._scaffold('content'),
+			this._abs(this._config.contentDir)
+		);
+
+		// Copy Templates
+		New._copyAll(
+			New._scaffold('templates'),
+			this._abs(this._config.templatesDir)
 		);
 	}
 
 	// Helpers
 	// =========================================================================
 
+	// Helpers: Config
+	// -------------------------------------------------------------------------
+
 	/**
 	 * Loads the config scaffold into a string and parses it into an object
 	 */
 	private _loadConfig () : void {
 		this._configScaffold = fs.readFileSync(
-			path.join(__dirname, '../scaffold/config.yml'),
+			New._scaffold('config.yml'),
 			'utf8'
 		);
 
@@ -247,6 +287,70 @@ class New {
 	 */
 	private static _trimSlashes (value : string) : string {
 		return value.replace(/^\/+|\/+$/, '');
+	}
+
+	// Helpers: Path
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Joins the given path to the absolute target path
+	 *
+	 * @param _path - Path to join
+	 */
+	private _abs (_path : string) : string {
+		return path.join(this._absPath, _path);
+	}
+
+	/**
+	 * Joins the given path to the scaffold path
+	 *
+	 * @param _path - Path to join
+	 */
+	private static _scaffold (_path : string) : string {
+		return path.join(__dirname, '../scaffold', _path);
+	}
+
+	// Helpers: Files / Directories
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Creates a directory at the given path and adds a .gitkeep
+	 *
+	 * @param _path - Directory to create
+	 */
+	private _createDir (_path : string) : void {
+		const target = this._abs(_path);
+
+		// Create the directory
+		fs.mkdirSync(target);
+
+		// Add a .gitkeep
+		fs.writeFileSync(
+			path.join(target, '.gitkeep'),
+			''
+		);
+	}
+
+	/**
+	 * Copies all (top-level) files from the given source to the given target
+	 *
+	 * @param src - Directory to copy from
+	 * @param target - Directory to copy to
+	 */
+	private static _copyAll (src : string, target : string) : void {
+		// NOTE: This assumes there are only top-level files
+		// (Lacks directory checks and recurrent copying)
+
+		const files = fs.readdirSync(src);
+
+		for (let i = 0, l = files.length; i < l; ++i) {
+			const file = files[i];
+
+			fs.copyFileSync(
+				path.join(src, file),
+				path.join(target, file)
+			);
+		}
 	}
 
 }
