@@ -12,7 +12,7 @@ export default class Zap {
 	static async run () {
 		console.clear();
 
-		// Change the title in the terminal
+		// Change the title in the terminal (important)
 		const title = '⚡️ Zap';
 		process.title = title;
 		process.stdout.write(
