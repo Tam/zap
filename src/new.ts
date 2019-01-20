@@ -12,6 +12,12 @@ class New {
 	// Properties: Private
 	// -------------------------------------------------------------------------
 
+	/** The path entered by the user */
+	private _path : string = '';
+
+	/** The absolute path to the target directory */
+	private _absPath : string = '';
+
 	/** The raw scaffold config file */
 	private _configScaffold : string = '';
 
@@ -24,32 +30,39 @@ class New {
 	/**
 	 * Starts everything to do with create a new Zap site
 	 *
-	 * @param path - The path to copy the scaffold to
+	 * @param _path - The path to copy the scaffold to
 	 */
-	async run (path : string) : Promise<void> {
+	async run (_path : string) : Promise<void> {
+		this._path = _path;
+
 		console.log(ZAP);
 
 		// 1. Check the path exists (create if it doesn't), and is empty
-		if (!await New.validatePath(path))
+		if (!await this.validatePath())
 			return;
+
+		this._absPath = path.join(process.cwd(), _path);
 
 		// 2. Inquirer all the settings in the config file and write out
 		this._loadConfig();
 
-		await this.configQuestionnaire();
+		await this.configureConfig();
 
-		console.log(path, this._config);
+		this.writeConfig();
 
 		// 3. Create directories and copy other scaffold files
 		// TODO
 	}
 
+	// Actions: Path
+	// -------------------------------------------------------------------------
+
 	/**
-	 * Validates the given path to ensure it exists, is writable, and is empty
-	 *
-	 * @param path - The path to validate
+	 * Validates the path to ensure it exists, is writable, and is empty
 	 */
-	static async validatePath (path : string) : Promise<boolean> {
+	async validatePath () : Promise<boolean> {
+		const path = this._path;
+
 		// Create dir if doesn't exist
 		if (!fs.existsSync(path)) {
 			fs.mkdirSync(path, {
@@ -94,11 +107,14 @@ class New {
 		return proceed;
 	}
 
+	// Actions: Config
+	// -------------------------------------------------------------------------
+
 	/**
 	 * Allows the user to customise the config file through a series of
 	 * questions
 	 */
-	async configQuestionnaire () : Promise<void> {
+	async configureConfig () : Promise<void> {
 		const when = (answers : any) => answers._confirm;
 
 		const answers : any = await inquirer.prompt([
@@ -172,6 +188,25 @@ class New {
 		].forEach(key => {
 			this._config[key] = New._trimSlashes(this._config[key]);
 		});
+	}
+
+	/**
+	 * Write the parsed config scaffold to the target path
+	 */
+	writeConfig () : void {
+		let config = this._configScaffold;
+
+		for (let [key, value] of Object.entries(this._config)) {
+			config = config.replace(
+				new RegExp(`§${key}§(.*)§`),
+				value as string
+			);
+		}
+
+		fs.writeFileSync(
+			path.join(this._absPath, 'config.yml'),
+			config
+		);
 	}
 
 	// Helpers
