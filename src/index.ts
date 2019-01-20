@@ -10,11 +10,14 @@ export default class Zap {
 	 * Do all the things
 	 */
 	static async run () {
+		console.clear();
+
 		// Change the title in the terminal
+		const title = '⚡️ Zap';
+		process.title = title;
 		process.stdout.write(
 			String.fromCharCode(27)
-			+ ']0;'
-			+ '⚡️ Zap'
+			+ ']0;' + title
 			+ String.fromCharCode(7)
 		);
 

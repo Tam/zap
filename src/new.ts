@@ -30,10 +30,10 @@ class New {
 		console.log(ZAP);
 
 		// 1. Check the path exists (create if it doesn't), and is empty
-		// TODO
+		if (!await New.validatePath(path))
+			return;
 
 		// 2. Inquirer all the settings in the config file and write out
-
 		this._loadConfig();
 
 		await this.configQuestionnaire();
@@ -44,7 +44,63 @@ class New {
 		// TODO
 	}
 
+	/**
+	 * Validates the given path to ensure it exists, is writable, and is empty
+	 *
+	 * @param path - The path to validate
+	 */
+	static async validatePath (path : string) : Promise<boolean> {
+		// Create dir if doesn't exist
+		if (!fs.existsSync(path)) {
+			fs.mkdirSync(path, {
+				recursive: true,
+			});
+
+			return true;
+		}
+
+		// Ensure we can access existing dir
+		try {
+			fs.accessSync(path);
+		} catch (e) {
+			console.log(
+				'Unable to access ' + path +
+				', please check permissions and try again!'
+			);
+
+			return false;
+		}
+
+		// Check if dir is empty
+		const files = fs.readdirSync(path);
+
+		if (files.length === 0)
+			return true;
+
+		// Allow the user to proceed at their own risk
+		// (good if something like .git already exists)
+		const { proceed } = await inquirer.prompt([
+			{
+				type: 'confirm',
+				name: 'proceed',
+				default: false,
+				message:
+					'Directory \'' + path +
+					'\' isn\'t empty, proceed anyway ' +
+					'(may cause issues or files to be deleted)?'
+			}
+		]);
+
+		return proceed;
+	}
+
+	/**
+	 * Allows the user to customise the config file through a series of
+	 * questions
+	 */
 	async configQuestionnaire () : Promise<void> {
+		const when = (answers : any) => answers._confirm;
+
 		const answers : any = await inquirer.prompt([
 			{
 				type: 'input',
@@ -69,8 +125,35 @@ class New {
 				name: '_confirm',
 				message: 'Would you like to configure the directories?',
 				default: false,
-			}
-			// TODO: If yes to above, allow setting of dir names
+			},
+			{
+				type: 'input',
+				name: 'webDir',
+				message: 'Web Directory',
+				default: this._config.webDir,
+				when,
+			},
+			{
+				type: 'input',
+				name: 'assetsDir',
+				message: 'Assets Directory',
+				default: this._config.assetsDir,
+				when,
+			},
+			{
+				type: 'input',
+				name: 'contentDir',
+				message: 'Content Directory',
+				default: this._config.contentDir,
+				when,
+			},
+			{
+				type: 'input',
+				name: 'templatesDir',
+				message: 'Templates Directory',
+				default: this._config.templatesDir,
+				when,
+			},
 		]);
 
 		delete answers._confirm;
@@ -79,6 +162,16 @@ class New {
 			...this._config,
 			...answers,
 		};
+
+		[
+			'url',
+			'webDir',
+			'assetsDir',
+			'contentDir',
+			'templatesDir',
+		].forEach(key => {
+			this._config[key] = New._trimSlashes(this._config[key]);
+		});
 	}
 
 	// Helpers
@@ -110,6 +203,15 @@ class New {
 		const matches = /§\w*§(.*)§/gm.exec(value);
 
 		return matches && matches.length > 1 ? matches[1] : value;
+	}
+
+	/**
+	 * Will trim the slashes of the given string
+	 *
+	 * @param value - String to trim
+	 */
+	private static _trimSlashes (value : string) : string {
+		return value.replace(/^\/+|\/+$/, '');
 	}
 
 }
