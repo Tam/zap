@@ -1,5 +1,6 @@
 import program from 'commander';
 import New from './new';
+import { ZAP } from './const';
 
 const pkg = require('../package.json');
 
@@ -20,16 +21,7 @@ export default class Zap {
 		// Do everything else.
 		program
 			.version(pkg.version, '-v, --version')
-			.description(
-				' _____             \n' +
-				'/__  /  ____ _____ \n' +
-				'  / /  / __ `/ __ \\\n' +
-				' / /__/ /_/ / /_/ /\n' +
-				'/____/\\__,_/ .___/ \n' +
-				'          /_/      \n' +
-				'\n' +
-				pkg.description
-			);
+			.description(ZAP + '\n' + pkg.description);
 
 		program
 			.command('new [path]')
@@ -59,7 +51,7 @@ export default class Zap {
 	 * Creates a new Zap site, simply by cloning the boilerplate folder
 	 * structure into the given location.
 	 *
-	 * @param {string} path - The location to create the new site, defaults to
+	 * @param path - The location to create the new site, defaults to
 	 *     the current location if not set.
 	 */
 	static async new (path : string = '.') : Promise<void> {

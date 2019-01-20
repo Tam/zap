@@ -3,11 +3,11 @@
 
 # Site
 ## The name of your site
-name: §name§Zapworth§
+name: §name§Zap§
 
 # URL
 ## Site URL: Your sites url, without the trailing slash
-url: §url§https://zapworth.example§
+url: §url§https://zap.sx§
 ## Site Root: If your site is in a subdirectory, set this to the directory path.
 ## For example, if your site will be `https://zapworth.example/blog` set root
 ## to `/blog/`
@@ -25,11 +25,11 @@ templatesDir: §templatesDir§templates§
 
 # Content
 ## Default Layout: The default template that all content will fallback to
-defaultLayout: §defaultLayout§index§
+defaultLayout: index
 ## Date Format: The default format of dates when output
-dateFormat: §dateFormat§YYYY-MM-DD§
+dateFormat: YYYY-MM-DD
 ## Time Format: The default format for time when output
-timeFormat: §timeFormat§HH:mm:ss§
+timeFormat: HH:mm:ss
 
 # Plugins (Coming Soon)
 ## Extend the functionality of Zap with fancy plugins!

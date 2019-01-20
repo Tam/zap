@@ -31,6 +31,7 @@
     "prepack": "rm -rf lib && tsc"
   },
   "devDependencies": {
+    "@types/inquirer": "^0.0.43",
     "@types/js-yaml": "^3.12.0",
     "@types/node": "^10.12.18",
     "commander": "^2.19.0",
@@ -38,6 +39,7 @@
     "typescript": "^3.2.4"
   },
   "dependencies": {
+    "inquirer": "^6.2.1",
     "js-yaml": "^3.12.1"
   }
 }
