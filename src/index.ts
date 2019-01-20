@@ -1,5 +1,6 @@
 import program from 'commander';
 import New from './new';
+import Serve from './serve';
 import { ZAP } from './const';
 
 const pkg = require('../package.json');
@@ -67,7 +68,7 @@ export default class Zap {
 	 * accordingly.
 	 */
 	static async serve () : Promise<void> {
-		console.log('SERVE!');
+		await Serve.run();
 	}
 
 	/**
