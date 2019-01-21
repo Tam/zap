@@ -5,22 +5,24 @@ export default class Query {
 
 	private readonly _collection : Collection<any>;
 
+	private _query : any = {};
+
 	// Constructor
 	// =========================================================================
 
 	constructor (collection : Collection<any>) {
 		this._collection = collection;
+
+		// TODO: Workout how to allow for dynamic functions in TS
+		return new Proxy(this, {
+			get (target: Query, key: PropertyKey): any {
+				return target._setQueryValue(key);
+			}
+		});
 	}
 
 	// Methods
 	// =========================================================================
-
-	find (query : any) : this {
-		// TODO: Is there a nicer way to handle querying, rather than an obj?
-		// Perhaps a getter to allow for `.title('hello')`?
-
-		return this;
-	}
 
 	limit (amount : number | null) : this {
 		// TODO
@@ -43,16 +45,25 @@ export default class Query {
 	// Returners
 	// =========================================================================
 
-	one () : any[] {
-		return this._buildQuery().limit(1).data();
+	one () : LokiObj | null {
+		const result = this._buildQuery().limit(1).data();
+
+		return result.length ? result[0] : null;
 	}
 
-	all () : any[] {
+	all () : LokiObj[] {
 		return this._buildQuery().data();
 	}
 
 	// Helpers
 	// =========================================================================
+
+	private _setQueryValue (key : PropertyKey) : (value : string) => this {
+		return (value : any) : this => {
+			this._query[key] = value;
+			return this;
+		};
+	}
 
 	private _buildQuery () : Resultset<LokiObj> {
 		// TODO: Build the query

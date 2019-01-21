@@ -1,6 +1,7 @@
 import { config } from './const';
 import Load from './load';
 import Loki from 'lokijs';
+import Query from './query';
 
 export default class Database {
 
@@ -29,13 +30,15 @@ export default class Database {
 		this._load.content().forEach(content => {
 			this._collection.insert(content);
 		});
+
+		console.log(this.find().route('/').all());
 	}
 
 	// Actions
 	// =========================================================================
 
-	find (opts : any) : Resultset<LokiObj> {
-		return this._collection.chain().find(opts);
+	find () : Query {
+		return new Query(this._collection);
 	}
 
 	// TODO: Write simplified query wrapper around loki, more Craft-esque
