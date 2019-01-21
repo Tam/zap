@@ -1,5 +1,6 @@
 import { config } from './const';
 import Load from './load';
+import Loki from 'lokijs';
 
 export default class Database {
 
@@ -11,20 +12,32 @@ export default class Database {
 
 	private readonly _load : Load;
 
+	private readonly _db : Loki;
+	private readonly _collection : Collection<any>;
+
 	// Constructor
 	// =========================================================================
 
 	constructor (config : config) {
 		this._config = config;
 
+		this._db = new Loki(Date.now().toString() + '-zap.db');
+		this._collection = this._db.addCollection('content');
+
 		this._load = new Load(config);
 
-		console.log(this._load.content());
+		this._load.content().forEach(content => {
+			this._collection.insert(content);
+		});
 	}
 
 	// Actions
 	// =========================================================================
 
-	//
+	find (opts : any) : Resultset<LokiObj> {
+		return this._collection.chain().find(opts);
+	}
+
+	// TODO: Write simplified query wrapper around loki, more Craft-esque
 
 }

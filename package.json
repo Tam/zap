@@ -33,6 +33,7 @@
   "devDependencies": {
     "@types/inquirer": "^0.0.43",
     "@types/js-yaml": "^3.12.0",
+    "@types/lokijs": "^1.5.2",
     "@types/node": "^10.12.18",
     "ts-node": "^7.0.1",
     "typescript": "^3.2.4"
@@ -41,6 +42,7 @@
     "commander": "^2.19.0",
     "gray-matter": "^4.0.2",
     "inquirer": "^6.2.1",
-    "js-yaml": "^3.12.1"
+    "js-yaml": "^3.12.1",
+    "lokijs": "^1.5.6"
   }
 }

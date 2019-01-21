@@ -3,6 +3,13 @@ import path from 'path';
 import { config } from './const';
 import Parse from './parse';
 
+export type ContentData = {
+	content: string;
+	route: string;
+	file: string;
+	[x: string]: any;
+};
+
 export default class Load {
 
 	// Properties
@@ -23,11 +30,11 @@ export default class Load {
 	/**
 	 * Loads the content files
 	 */
-	content () : object {
-		const path = Load._cwd(this._config.contentDir);
+	content () : ContentData[] {
+		const _path = Load._cwd(this._config.contentDir);
 
 		const files = Load._walk(
-			path,
+			_path,
 			[
 				'.md',
 				'.markdown',
@@ -41,11 +48,30 @@ export default class Load {
 			]
 		);
 
-		const content : any = {};
+		const content : ContentData[] = [];
 
 		files.forEach(file => {
 			const str = fs.readFileSync(file, 'utf8');
-			content[file] = Parse.content(str);
+
+			let route = file
+				.replace(_path, '')
+				.replace(path.extname(file), '');
+
+			if (route.endsWith('index'))
+				route = route.slice(0, -5);
+
+			const fileData = Parse.content(str);
+
+			// @ts-ignore
+			delete fileData.isEmpty;
+			delete fileData.excerpt;
+
+			content.push({
+				...fileData.data,
+				content: fileData.content,
+				route,
+				file,
+			});
 		});
 
 		return content;

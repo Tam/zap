@@ -27,7 +27,9 @@ export default class Serve {
 	// =========================================================================
 
 	async run () : Promise<void> {
-		console.log('SERVE!');
+		console.log(this._database.find({
+			route: '/',
+		}).limit(1).data());
 	}
 
 }
