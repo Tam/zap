@@ -68,7 +68,7 @@ export default class Zap {
 	 * accordingly.
 	 */
 	static async serve () : Promise<void> {
-		await Serve.run();
+		await (new Serve()).run();
 	}
 
 	/**

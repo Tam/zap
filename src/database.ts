@@ -1,8 +1,7 @@
-import Config from './config';
-import Database from './database';
 import { config } from './const';
+import Load from './load';
 
-export default class Serve {
+export default class Database {
 
 	// Properties
 	// =========================================================================
@@ -10,23 +9,22 @@ export default class Serve {
 	/** The current sites config */
 	private readonly _config : config;
 
-	private _database : Database | null = null;
+	private readonly _load : Load;
 
 	// Constructor
 	// =========================================================================
 
-	constructor () {
-		// TODO: On reload on config file change
-		this._config = new Config() as unknown as config;
+	constructor (config : config) {
+		this._config = config;
 
-		this._database = new Database(this._config);
+		this._load = new Load(config);
+
+		console.log(this._load.content());
 	}
 
 	// Actions
 	// =========================================================================
 
-	async run () : Promise<void> {
-		console.log('SERVE!');
-	}
+	//
 
 }
