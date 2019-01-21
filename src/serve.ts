@@ -10,7 +10,8 @@ export default class Serve {
 	/** The current sites config */
 	private readonly _config : config;
 
-	private _database : Database | null = null;
+	/** The sites content database */
+	private readonly _database : Database;
 
 	// Constructor
 	// =========================================================================
