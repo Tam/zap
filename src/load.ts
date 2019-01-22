@@ -51,7 +51,8 @@ export default class Load {
 		const content : ContentData[] = [];
 
 		files.forEach(file => {
-			const str = fs.readFileSync(file, 'utf8');
+			const str = fs.readFileSync(file, 'utf8')
+				, stats = fs.statSync(file);
 
 			let route = file
 				.replace(_path, '')
@@ -67,6 +68,8 @@ export default class Load {
 			delete fileData.excerpt;
 
 			content.push({
+				date: stats.ctime,
+				updated: stats.mtime,
 				...fileData.data,
 				content: fileData.content,
 				route,

@@ -30,8 +30,6 @@ export default class Database {
 		this._load.content().forEach(content => {
 			this._collection.insert(content);
 		});
-
-		console.log(this.find().route('/').all());
 	}
 
 	// Actions
@@ -40,7 +38,5 @@ export default class Database {
 	find () : Query {
 		return new Query(this._collection);
 	}
-
-	// TODO: Write simplified query wrapper around loki, more Craft-esque
 
 }

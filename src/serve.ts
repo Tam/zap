@@ -27,9 +27,8 @@ export default class Serve {
 	// =========================================================================
 
 	async run () : Promise<void> {
-		console.log(this._database.find({
-			route: '/',
-		}).limit(1).data());
+		// @ts-ignore
+		console.log(this._database.find().route('/', '!==').all());
 	}
 
 }
