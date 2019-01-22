@@ -3,6 +3,7 @@ export default class Query {
 	// Properties
 	// =========================================================================
 
+	/** The collection to query */
 	private readonly _collection : Collection<any>;
 
 	/** Field options */
@@ -33,18 +34,28 @@ export default class Query {
 	// Methods
 	// =========================================================================
 
+	/**
+	 * Number of results to limit to
+	 */
 	limit (amount : number | null) : this {
 		this._queryOpts.limit = amount;
 
 		return this;
 	}
 
+	/**
+	 * Number of results to offset by
+	 */
 	offset (amount : number) : this {
 		this._queryOpts.offset = amount;
 
 		return this;
 	}
 
+	/**
+	 * Sort the results
+	 * `.sort('title asc, date desc')`
+	 */
 	sort (sorting : string) : this {
 		const sortOpts : [string, boolean][] = [];
 
@@ -53,7 +64,7 @@ export default class Query {
 
 			sortOpts.push([
 				field,
-				dir === 'desc'
+				dir.toLowerCase() === 'desc'
 			]);
 		});
 
@@ -65,6 +76,9 @@ export default class Query {
 	// Returners
 	// =========================================================================
 
+	/**
+	 * Return the first result
+	 */
 	one () : LokiObj | null {
 		this.limit(null);
 
@@ -73,6 +87,9 @@ export default class Query {
 		return result.length ? result[0] : null;
 	}
 
+	/**
+	 * Return all results
+	 */
 	all () : LokiObj[] {
 		return this._buildQuery().data();
 	}
@@ -80,6 +97,9 @@ export default class Query {
 	// Helpers
 	// =========================================================================
 
+	/**
+	 * Returns a function to set the value and selector of the given key (field)
+	 */
 	private _setQueryValue (key : PropertyKey) : (value : any, selector ?: string) => this {
 		return (value : any, selector : string = '===') : this => {
 			selector = Query._convertSelector(
@@ -95,6 +115,9 @@ export default class Query {
 		};
 	}
 
+	/**
+	 * Builds the query
+	 */
 	private _buildQuery () : Resultset<LokiObj> {
 		let chain = this._collection.chain();
 
@@ -114,6 +137,9 @@ export default class Query {
 		return chain;
 	}
 
+	/**
+	 * Converts our friendly selectors into Loki ones
+	 */
 	private static _convertSelector (selector : string, isDate : boolean) : string {
 		switch (selector) {
 			case '!==':

@@ -11,9 +11,13 @@ export default class Database {
 	/** The current sites config */
 	private readonly _config : config;
 
+	/** Content loader */
 	private readonly _load : Load;
 
+	/** The Loki database */
 	private readonly _db : Loki;
+
+	/** Content data collection */
 	private readonly _collection : Collection<any>;
 
 	// Constructor
@@ -35,6 +39,9 @@ export default class Database {
 	// Actions
 	// =========================================================================
 
+	/**
+	 * Returns a query for the content database
+	 */
 	find () : Query {
 		return new Query(this._collection);
 	}
