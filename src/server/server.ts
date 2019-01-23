@@ -60,8 +60,6 @@ export default class Server {
 			process.cwd().replace(/[\W_]+/g, '_') + '.pem'
 		);
 
-		console.log(certPath);
-
 		let certExists = fs.existsSync(certPath);
 
 		if (certExists) {
@@ -164,7 +162,6 @@ export default class Server {
 							value: '[::1]'
 						},
 						{
-							// type 7 is IP
 							type: 7,
 							ip: '127.0.0.1'
 						},

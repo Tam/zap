@@ -2,7 +2,7 @@ import Config from './config';
 import Database from './db/database';
 import { config } from './const';
 import Server from './server/server';
-import { constants } from 'http2';
+import { constants, IncomingHttpHeaders, ServerHttp2Stream } from 'http2';
 
 export default class Serve {
 
@@ -22,7 +22,7 @@ export default class Serve {
 	// =========================================================================
 
 	constructor (port : number) {
-		// TODO: On reload on config file change
+		// TODO: On reload on config file change?
 		this._config = new Config() as unknown as config;
 
 		this._database = new Database(this._config);
@@ -34,24 +34,35 @@ export default class Serve {
 	// =========================================================================
 
 	async run () : Promise<void> {
-		this._server.onStream((stream, headers) => {
-			stream.setDefaultEncoding('utf8');
-			stream.setEncoding('utf8');
-			const route = headers[constants.HTTP2_HEADER_PATH];
+		this._server.onStream(this.onStream);
 
-			// @ts-ignore
-			const content = this._database.find().route(route, '===').one();
+		this._server.start();
+	}
 
-			if (!content) {
-				// TODO: Try serving from assets
+	// Events
+	// =========================================================================
 
-				stream.respond({
-					'content-type': 'text/html',
-					':status': 404,
-				});
+	/**
+	 * Handles the servers onStream event, serves the site
+	 */
+	onStream = (stream: ServerHttp2Stream, headers: IncomingHttpHeaders) => {
+		stream.setDefaultEncoding('utf8');
+		stream.setEncoding('utf8');
+		const route = headers[constants.HTTP2_HEADER_PATH];
 
-				// TODO: Serve pretty 404
-				stream.end(`
+		// @ts-ignore
+		const content = this._database.find().route(route, '===').one();
+
+		if (!content) {
+			// TODO: Try serving from assets
+
+			stream.respond({
+				'content-type': 'text/html',
+				':status': 404,
+			});
+
+			// TODO: Serve pretty 404
+			stream.end(`
 					<!doctype html>
 					<html lang="en">
 					<head>
@@ -65,15 +76,15 @@ export default class Serve {
 					</html>
 				`);
 
-				return;
-			}
+			return;
+		}
 
-			stream.respond({
-				'content-type': 'text/html',
-				':status': 200,
-			});
+		stream.respond({
+			'content-type': 'text/html',
+			':status': 200,
+		});
 
-			stream.end(`
+		stream.end(`
 				<!doctype html>
 				<html lang="en">
 				<head>
@@ -85,9 +96,6 @@ export default class Serve {
 				</body>
 				</html>
 			`);
-		});
-
-		this._server.start();
-	}
+	};
 
 }
