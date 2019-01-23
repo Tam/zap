@@ -43,6 +43,7 @@
     "gray-matter": "^4.0.2",
     "inquirer": "^6.2.1",
     "js-yaml": "^3.12.1",
-    "lokijs": "^1.5.6"
+    "lokijs": "^1.5.6",
+    "selfsigned": "^1.10.4"
   }
 }

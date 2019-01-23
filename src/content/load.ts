@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { config } from './const';
+import { config } from '../const';
 import Parse from './parse';
 
 export type ContentData = {

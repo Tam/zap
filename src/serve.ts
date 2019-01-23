@@ -1,6 +1,8 @@
 import Config from './config';
-import Database from './database';
+import Database from './db/database';
 import { config } from './const';
+import Server from './server/server';
+import { constants } from 'http2';
 
 export default class Serve {
 
@@ -13,22 +15,79 @@ export default class Serve {
 	/** The sites content database */
 	private readonly _database : Database;
 
+	/** The local dev server */
+	private readonly _server : Server;
+
 	// Constructor
 	// =========================================================================
 
-	constructor () {
+	constructor (port : number) {
 		// TODO: On reload on config file change
 		this._config = new Config() as unknown as config;
 
 		this._database = new Database(this._config);
+
+		this._server = new Server(port);
 	}
 
 	// Actions
 	// =========================================================================
 
 	async run () : Promise<void> {
-		// @ts-ignore
-		console.log(this._database.find().route('/', '!==').all());
+		this._server.onStream((stream, headers) => {
+			stream.setDefaultEncoding('utf8');
+			stream.setEncoding('utf8');
+			const route = headers[constants.HTTP2_HEADER_PATH];
+
+			// @ts-ignore
+			const content = this._database.find().route(route, '===').one();
+
+			if (!content) {
+				// TODO: Try serving from assets
+
+				stream.respond({
+					'content-type': 'text/html',
+					':status': 404,
+				});
+
+				// TODO: Serve pretty 404
+				stream.end(`
+					<!doctype html>
+					<html lang="en">
+					<head>
+						<meta charset="utf-8" />
+						<title>❌ Page not found!</title>
+					</head>
+					<body>
+						<h1>❌ Page not found!</h1>
+						<p>We couldn't find a file matching the route <code>${route}</code></p>
+					</body>
+					</html>
+				`);
+
+				return;
+			}
+
+			stream.respond({
+				'content-type': 'text/html',
+				':status': 200,
+			});
+
+			stream.end(`
+				<!doctype html>
+				<html lang="en">
+				<head>
+					<meta charset="utf-8" />
+					<title>${content.title}</title>
+				</head>
+				<body>
+					<pre>${content.content}</pre>
+				</body>
+				</html>
+			`);
+		});
+
+		this._server.start();
 	}
 
 }

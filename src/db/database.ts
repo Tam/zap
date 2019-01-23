@@ -1,5 +1,5 @@
-import { config } from './const';
-import Load from './load';
+import { config } from '../const';
+import Load from '../content/load';
 import Loki from 'lokijs';
 import Query from './query';
 

@@ -17,8 +17,9 @@ node_modules/
 # JetBrains
 .idea
 
-# Compiled Files
+# Compiled / Generated Files
 /lib
+/.certs
 
 # Dev
 /test

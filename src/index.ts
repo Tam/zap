@@ -1,7 +1,8 @@
-import program from 'commander';
+import program, { Command } from 'commander';
 import New from './new';
 import Serve from './serve';
 import { ZAP } from './const';
+import { Options } from 'ts-node';
 
 const pkg = require('../package.json');
 
@@ -34,6 +35,7 @@ export default class Zap {
 
 		program
 			.command('serve')
+			.option('-p, --port <n>', 'Set the server port', 8080)
 			.description('Starts the local development server')
 			.action(Zap.serve);
 
@@ -67,8 +69,8 @@ export default class Zap {
 	 * Also watches the site files for any changes and compiles / reloads
 	 * accordingly.
 	 */
-	static async serve () : Promise<void> {
-		await (new Serve()).run();
+	static async serve (cmd : any) : Promise<void> {
+		await (new Serve(+cmd.port)).run();
 	}
 
 	/**

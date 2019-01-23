@@ -1,3 +1,5 @@
+import { ContentData } from '../content/load';
+
 export default class Query {
 
 	// Properties
@@ -79,7 +81,7 @@ export default class Query {
 	/**
 	 * Return the first result
 	 */
-	one () : LokiObj | null {
+	one () : LokiObj | ContentData | null {
 		this.limit(null);
 
 		const result = this._buildQuery().limit(1).data();
@@ -90,7 +92,7 @@ export default class Query {
 	/**
 	 * Return all results
 	 */
-	all () : LokiObj[] {
+	all () : LokiObj[] | ContentData[] {
 		return this._buildQuery().data();
 	}
 
