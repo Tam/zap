@@ -19,3 +19,23 @@ export type config = {
 	timeFormat: string;
 	[x: string]: any;
 };
+
+export const EXTENSIONS = {
+	CONTENT: [
+		'.md',
+		'.markdown',
+		'.mdown',
+		'.mkdn',
+		'.mkd',
+		'.mdtxt',
+		'.mdtext',
+		'.text',
+		'.Rmd',
+	],
+
+	TEMPLATES: [
+		'.njk',
+		'.html',
+		'.nunjucks',
+	],
+};

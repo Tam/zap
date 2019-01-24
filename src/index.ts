@@ -1,8 +1,7 @@
-import program, { Command } from 'commander';
+import program from 'commander';
 import New from './new';
 import Serve from './serve';
 import { ZAP } from './const';
-import { Options } from 'ts-node';
 
 const pkg = require('../package.json');
 

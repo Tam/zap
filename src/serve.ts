@@ -3,6 +3,7 @@ import Database from './db/database';
 import { config } from './const';
 import Server from './server/server';
 import { constants, IncomingHttpHeaders, ServerHttp2Stream } from 'http2';
+import Renderer from './renderer';
 
 export default class Serve {
 
@@ -18,16 +19,22 @@ export default class Serve {
 	/** The local dev server */
 	private readonly _server : Server;
 
+	private readonly _renderer : Renderer;
+
 	// Constructor
 	// =========================================================================
 
 	constructor (port : number) {
-		// TODO: On reload on config file change?
 		this._config = new Config() as unknown as config;
 
 		this._database = new Database(this._config);
 
 		this._server = new Server(port);
+
+		this._renderer = new Renderer(
+			this._config,
+			this._database
+		);
 	}
 
 	// Actions
@@ -48,7 +55,7 @@ export default class Serve {
 	onStream = (stream: ServerHttp2Stream, headers: IncomingHttpHeaders) => {
 		stream.setDefaultEncoding('utf8');
 		stream.setEncoding('utf8');
-		const route = headers[constants.HTTP2_HEADER_PATH];
+		const route = headers[constants.HTTP2_HEADER_PATH] as string;
 
 		// @ts-ignore
 		const content = this._database.find().route(route, '===').one();
@@ -61,20 +68,10 @@ export default class Serve {
 				':status': 404,
 			});
 
-			// TODO: Serve pretty 404
-			stream.end(`
-					<!doctype html>
-					<html lang="en">
-					<head>
-						<meta charset="utf-8" />
-						<title>❌ Page not found!</title>
-					</head>
-					<body>
-						<h1>❌ Page not found!</h1>
-						<p>We couldn't find a file matching the route <code>${route}</code></p>
-					</body>
-					</html>
-				`);
+			// TODO: Fallback if no 404 template
+			stream.end(this._renderer.renderRoute('404', {
+				title: '❌ Page not found!',
+			}));
 
 			return;
 		}
@@ -84,18 +81,7 @@ export default class Serve {
 			':status': 200,
 		});
 
-		stream.end(`
-				<!doctype html>
-				<html lang="en">
-				<head>
-					<meta charset="utf-8" />
-					<title>${content.title}</title>
-				</head>
-				<body>
-					<pre>${content.content}</pre>
-				</body>
-				</html>
-			`);
+		stream.end(this._renderer.renderRoute(route, content));
 	};
 
 }

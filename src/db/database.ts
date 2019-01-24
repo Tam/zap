@@ -12,13 +12,15 @@ export default class Database {
 	private readonly _config : config;
 
 	/** Content loader */
-	private readonly _load : Load;
+	readonly load : Load;
 
 	/** The Loki database */
 	private readonly _db : Loki;
 
-	/** Content data collection */
-	private readonly _collection : Collection<any>;
+	/** DB collections */
+	private readonly _assetsCollection : Collection<any>;
+	private readonly _contentCollection : Collection<any>;
+	private readonly _templatesCollection : Collection<any>;
 
 	// Constructor
 	// =========================================================================
@@ -27,12 +29,19 @@ export default class Database {
 		this._config = config;
 
 		this._db = new Loki(Date.now().toString() + '-zap.db');
-		this._collection = this._db.addCollection('content');
 
-		this._load = new Load(config);
+		this._assetsCollection = this._db.addCollection('assets');
+		this._contentCollection = this._db.addCollection('content');
+		this._templatesCollection = this._db.addCollection('templates');
 
-		this._load.content().forEach(content => {
-			this._collection.insert(content);
+		this.load = new Load(config);
+
+		this.load.content().forEach(content => {
+			this._contentCollection.insert(content);
+		});
+
+		this.load.templates().forEach(template => {
+			this._templatesCollection.insert(template);
 		});
 	}
 
@@ -40,10 +49,17 @@ export default class Database {
 	// =========================================================================
 
 	/**
-	 * Returns a query for the content database
+	 * Returns a query for the content collection
 	 */
 	find () : Query {
-		return new Query(this._collection);
+		return new Query(this._contentCollection);
+	}
+
+	/**
+	 * Returns a query for the template collection
+	 */
+	findTemplate () : Query {
+		return new Query(this._templatesCollection);
 	}
 
 }
