@@ -5,6 +5,8 @@ import showdown, { Converter } from 'showdown';
 import SafeString = runtime.SafeString;
 import hljs from 'highlight.js';
 import he from 'he';
+// @ts-ignore
+import showdownGhostFootnotes from 'showdown-ghost-footnotes';
 
 
 export default class Renderer {
@@ -28,9 +30,13 @@ export default class Renderer {
 		showdown.setFlavor('github');
 		this._converter = new showdown.Converter({
 			omitExtraWLInCodeBlocks: true,
+			strikethrough: true,
+			tables: true,
+			tasklists: true,
 			noHeaderId: true,
 			extensions: [
 				this._autoHighlightPlugin(),
+				showdownGhostFootnotes,
 			],
 		});
 	}

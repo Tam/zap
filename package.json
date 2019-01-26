@@ -52,6 +52,7 @@
     "lokijs": "^1.5.6",
     "nunjucks": "^3.1.7",
     "selfsigned": "^1.10.4",
-    "showdown": "^1.9.0"
+    "showdown": "^1.9.0",
+    "showdown-ghost-footnotes": "^0.0.6"
   }
 }
