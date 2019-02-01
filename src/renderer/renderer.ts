@@ -1,12 +1,13 @@
-import { config } from './const';
+import { config } from '../const';
 import nunjucks, { runtime } from 'nunjucks';
-import Database from './db/database';
+import Database from '../db/database';
 import showdown, { Converter } from 'showdown';
 import SafeString = runtime.SafeString;
 import hljs from 'highlight.js';
 import he from 'he';
 // @ts-ignore
 import showdownGhostFootnotes from 'showdown-ghost-footnotes';
+import SliceExtension from './slice';
 
 
 export default class Renderer {
@@ -27,6 +28,11 @@ export default class Renderer {
 		this._database = db;
 
 		this._env = nunjucks.configure(config.templatesDir);
+		this._env.addExtension(
+			'SliceExtension',
+			new SliceExtension()
+		);
+
 		showdown.setFlavor('github');
 		this._converter = new showdown.Converter({
 			omitExtraWLInCodeBlocks: true,

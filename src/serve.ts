@@ -3,7 +3,7 @@ import Database from './db/database';
 import { config } from './const';
 import Server from './server/server';
 import { constants, IncomingHttpHeaders, ServerHttp2Stream } from 'http2';
-import Renderer from './renderer';
+import Renderer from './renderer/renderer';
 
 export default class Serve {
 
