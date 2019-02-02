@@ -6,6 +6,7 @@ import he from 'he';
 import Twig from 'twig';
 // @ts-ignore
 import showdownGhostFootnotes from 'showdown-ghost-footnotes';
+import Slice from './Slice';
 
 export default class Renderer {
 
@@ -21,6 +22,9 @@ export default class Renderer {
 	constructor (config : config, db : Database) {
 		this._config = config;
 		this._database = db;
+
+		// @ts-ignore
+		Twig.extend(Slice);
 
 		showdown.setFlavor('github');
 		this._converter = new showdown.Converter({
