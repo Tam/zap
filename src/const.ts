@@ -34,8 +34,7 @@ export const EXTENSIONS = {
 	],
 
 	TEMPLATES: [
-		'.njk',
+		'.twig',
 		'.html',
-		'.nunjucks',
 	],
 };

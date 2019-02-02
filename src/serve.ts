@@ -52,7 +52,7 @@ export default class Serve {
 	/**
 	 * Handles the servers onStream event, serves the site
 	 */
-	onStream = (stream: ServerHttp2Stream, headers: IncomingHttpHeaders) => {
+	onStream = async (stream: ServerHttp2Stream, headers: IncomingHttpHeaders) => {
 		stream.setDefaultEncoding('utf8');
 		stream.setEncoding('utf8');
 		const route = headers[constants.HTTP2_HEADER_PATH] as string;
@@ -69,9 +69,10 @@ export default class Serve {
 			});
 
 			// TODO: Fallback if no 404 template
-			stream.end(this._renderer.renderRoute('404', {
+			const html = await this._renderer.renderRoute('404', {
 				title: '❌ Page not found!',
-			}));
+			});
+			stream.end(html);
 
 			return;
 		}
@@ -81,7 +82,8 @@ export default class Serve {
 			':status': 200,
 		});
 
-		stream.end(this._renderer.renderRoute(route, content));
+		const html = await this._renderer.renderRoute(route, content);
+		stream.end(html);
 	};
 
 }

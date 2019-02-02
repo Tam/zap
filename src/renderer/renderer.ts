@@ -1,14 +1,11 @@
 import { config } from '../const';
-import nunjucks, { runtime } from 'nunjucks';
 import Database from '../db/database';
 import showdown, { Converter } from 'showdown';
-import SafeString = runtime.SafeString;
 import hljs from 'highlight.js';
 import he from 'he';
+import Twig from 'twig';
 // @ts-ignore
 import showdownGhostFootnotes from 'showdown-ghost-footnotes';
-import SliceExtension from './slice';
-
 
 export default class Renderer {
 
@@ -19,19 +16,11 @@ export default class Renderer {
 
 	private readonly _database : Database;
 
-	private readonly _env : any;
-
 	private readonly _converter : Converter;
 
 	constructor (config : config, db : Database) {
 		this._config = config;
 		this._database = db;
-
-		this._env = nunjucks.configure(config.templatesDir);
-		this._env.addExtension(
-			'SliceExtension',
-			new SliceExtension()
-		);
 
 		showdown.setFlavor('github');
 		this._converter = new showdown.Converter({
@@ -50,13 +39,28 @@ export default class Renderer {
 	// Actions
 	// =========================================================================
 
-	renderRoute (route : string, content : any = {}) : string {
+	renderRoute (route : string, content : any = {}) : Promise<any> {
 		const file = this._getTemplateByRoute(route);
 
-		return this._env.render(file, {
-			...content,
-			content: this._renderMarkdown(content.content),
-			config: this._config,
+		if (!file) {
+			return Promise.resolve(
+				'TODO: No template error, ' + route
+			);
+		}
+
+		return new Promise(resolve => {
+			Twig.renderFile(file, {
+				...content,
+				content: this._renderMarkdown(content.content),
+				config: this._config,
+			}, (err, html) => {
+				if (!err)
+					return resolve(html);
+
+				// TODO: Nice error page
+				console.log(err);
+				resolve('<pre><code>' + err.message + '</code></pre>');
+			});
 		});
 	}
 
@@ -69,12 +73,12 @@ export default class Renderer {
 	/**
 	 * Gets the template by the given route
 	 */
-	private _getTemplateByRoute (route : string) : string {
+	private _getTemplateByRoute (route : string) : string | null {
 		// @ts-ignore
 		const template = this._database.findTemplate().route(route).one();
 
 		if (!template)
-			return 'TODO: Fallback template';
+			return null;
 
 		return template.file;
 	}
@@ -82,11 +86,11 @@ export default class Renderer {
 	// Helpers: Markdown
 	// -------------------------------------------------------------------------
 
-	private _renderMarkdown (markdown : string = '') : SafeString {
-		return new SafeString(
+	private _renderMarkdown (markdown : string = '') : String {
+		return this._markup(
 			this._converter.makeHtml(
 				markdown.replace(/\t/g, '_XYZZY_TAB_')
-			).replace(/_XYZZY_TAB_/g, '\t'),
+			).replace(/_XYZZY_TAB_/g, '\t')
 		);
 	}
 
@@ -136,6 +140,18 @@ export default class Renderer {
 				);
 			},
 		}];
+	}
+
+	// Helpers: Twig
+	// -------------------------------------------------------------------------
+
+	private _markup (content : string) {
+		// @ts-ignore
+		const output = new String(content);
+		// @ts-ignore
+		output.twig_markup = 'html';
+
+		return output;
 	}
 
 }
