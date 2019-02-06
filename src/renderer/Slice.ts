@@ -1,6 +1,7 @@
 type SliceToken = {
 	name: string;
 	fixed: boolean;
+	output: any;
 };
 
 export default function Slice (Twig : any) {
@@ -19,12 +20,47 @@ export default function Slice (Twig : any) {
 			return { ...token, name, fixed };
 		},
 		parse (token : SliceToken, context : any, chain : any) {
-			// https://github.com/twigjs/twig.js/wiki/Extending-twig.js-With-Custom-Tags
-			// https://github.com/twigjs/twig.js/blob/e901f9ec7da9a9407126eda75bb59a8e4ce665b0/src/twig.logic.js#L841-L934
-			console.log(this, token, context, chain);
+			if (token.fixed) {
+				const sliceContext = {
+					...context,
+					[token.name]: { url: '', alt: '' },
+				};
+
+				console.log(token.output);
+
+				// FIXME: Not outputting anything, not erroring :(
+				return Twig.parseAsync.call(
+					this,
+					token.output,
+					sliceContext
+				);
+			}
+
+			if (!this.hasOwnProperty('slices')) {
+				// Create the slice object on this template
+				this.slices = {};
+				// Add it to the output context under the name `__slices`
+				// (so {{ __slices.image(__slice_image_0) }} should work?)
+				context.__slices = this.slices;
+			}
+
+			const template = this;
+
+			this.slices[token.name] = function () {
+				const sliceContext = {
+					...context,
+					[token.name]: {/* TODO: pass slice data */},
+				};
+
+				return Twig.parseAsync.call(
+					template,
+					token.output,
+					sliceContext
+				);
+			};
 
 			return {
-				content: '',
+				output: '',
 				chain,
 			};
 		},
