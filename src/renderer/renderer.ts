@@ -7,6 +7,7 @@ import Twig from 'twig';
 // @ts-ignore
 import showdownGhostFootnotes from 'showdown-ghost-footnotes';
 import Slice from './Slice';
+import Parse from '../content/parse';
 
 export default class Renderer {
 
@@ -18,6 +19,8 @@ export default class Renderer {
 	private readonly _database : Database;
 
 	private readonly _converter : Converter;
+
+	private _sliceData : any = {};
 
 	constructor (config : config, db : Database) {
 		this._config = config;
@@ -35,6 +38,7 @@ export default class Renderer {
 			noHeaderId: true,
 			extensions: [
 				this._autoHighlightPlugin(),
+				this._slicePlugin(),
 				showdownGhostFootnotes,
 			],
 		});
@@ -44,6 +48,8 @@ export default class Renderer {
 	// =========================================================================
 
 	renderRoute (route : string, content : any = {}) : Promise<any> {
+		this._sliceData = {};
+
 		const file = this._getTemplateByRoute(route);
 
 		if (!file) {
@@ -57,6 +63,7 @@ export default class Renderer {
 				...content,
 				content: this._renderMarkdown(content.content),
 				config: this._config._config,
+				...this._sliceData,
 			}, (err, html) => {
 				if (!err)
 					return resolve(html);
@@ -143,6 +150,45 @@ export default class Renderer {
 					right,
 					flags,
 				);
+			},
+		}];
+	}
+
+	private _slicePlugin () : any {
+		const rgx = /---[\r\n]([a-zA-Z]\w*):[\r\n][\S\s]*?[\r\n]---/gm
+			, sliceIndexes : any = {};
+
+		return [{
+			type: 'lang',
+			filter: (text : string) => {
+				let m;
+
+				while ((m = rgx.exec(text)) !== null) {
+					if (m.index === rgx.lastIndex)
+						rgx.lastIndex++;
+
+					const [full, name] = m;
+
+					if (!sliceIndexes.hasOwnProperty(name))
+						sliceIndexes[name] = -1;
+
+					sliceIndexes[name]++;
+
+					const handle = `__slice_${name}_${sliceIndexes[name]}`;
+
+					this._sliceData[handle] = Parse.content(full).data[name];
+
+					console.log(handle);
+
+					text = text.replace(
+						full,
+						`{{ __slices.${name}(${handle}) }}`
+					);
+
+					this._sliceData[handle] = Parse.content(full).data[name];
+				}
+
+				return text;
 			},
 		}];
 	}
