@@ -21,15 +21,10 @@ export default function Slice (Twig : any) {
 		},
 		parse (token : SliceToken, context : any, chain : any) {
 			if (token.fixed) {
-				const sliceContext = {
-					...context,
-					[token.name]: { src: 'https://source.unsplash.com/random/400x400', alt: 'Hello' },
-				};
-
 				return Twig.parseAsync.call(
 					this,
 					token.output,
-					sliceContext
+					context
 				).then((output : any) => ({
 					output,
 					chain,
@@ -39,17 +34,21 @@ export default function Slice (Twig : any) {
 			if (!this.hasOwnProperty('slices')) {
 				// Create the slice object on this template
 				this.slices = {};
-				// Add it to the output context under the name `__slices`
-				// (so {{ __slices.image(__slice_image_0) }} should work?)
-				context.__slices = this.slices;
 			}
+
+			// Add it to the output context under the name `__slices`
+			// (so {{ __slices.image(__slice_image_0) }} should work?)
+			context.__slices = this.slices;
+
+			if (this.slices.hasOwnProperty(token.name))
+				return { output: '', chain };
 
 			const template = this;
 
-			this.slices[token.name] = function () {
+			this.slices[token.name] = function (key : string) {
 				const sliceContext = {
 					...context,
-					[token.name]: {/* TODO: pass slice data */},
+					[token.name]: context[key],
 				};
 
 				return Twig.parseAsync.call(
