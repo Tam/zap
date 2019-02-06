@@ -56,7 +56,7 @@ export default class Renderer {
 			Twig.renderFile(file, {
 				...content,
 				content: this._renderMarkdown(content.content),
-				config: this._config,
+				config: this._config._config,
 			}, (err, html) => {
 				if (!err)
 					return resolve(html);
@@ -94,7 +94,8 @@ export default class Renderer {
 		return this._markup(
 			this._converter.makeHtml(
 				markdown.replace(/\t/g, '_XYZZY_TAB_')
-			).replace(/_XYZZY_TAB_/g, '\t')
+			// ).replace(/_XYZZY_TAB_/g, '\t')
+			).replace(/_XYZZY_TAB_/g, '<span class="tab"></span>')
 		);
 	}
 
@@ -151,8 +152,10 @@ export default class Renderer {
 
 	private _markup (content : string) {
 		// @ts-ignore
+		// noinspection JSPrimitiveTypeWrapperUsage
 		const output = new String(content);
 		// @ts-ignore
+		// noinspection JSPrimitiveTypeWrapperUsage
 		output.twig_markup = 'html';
 
 		return output;

@@ -34,8 +34,10 @@ export default class Config {
 		this.parse(config);
 
 		return new Proxy(this, {
-			get (target: Config, key: PropertyKey): any {
-				return target._config[key];
+			get (target: Config | any, key: PropertyKey): any {
+				return target._config.hasOwnProperty(key)
+					? target._config[key]
+					: target[key];
 			},
 		});
 	}
@@ -66,6 +68,13 @@ export default class Config {
 	 */
 	parse (config : string) : void {
 		this._config = yaml.safeLoad(config);
+	}
+
+	/**
+	 * Returns the config as an object
+	 */
+	toObject () : object {
+		return this._config;
 	}
 
 }

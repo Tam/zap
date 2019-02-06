@@ -21,7 +21,12 @@ export default function Slice (Twig : any) {
 		parse (token : SliceToken, context : any, chain : any) {
 			// https://github.com/twigjs/twig.js/wiki/Extending-twig.js-With-Custom-Tags
 			// https://github.com/twigjs/twig.js/blob/e901f9ec7da9a9407126eda75bb59a8e4ce665b0/src/twig.logic.js#L841-L934
-			console.log(token, context, chain);
+			console.log(this, token, context, chain);
+
+			return {
+				content: '',
+				chain,
+			};
 		},
 	});
 
