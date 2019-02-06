@@ -3,7 +3,7 @@ import Database from '../db/database';
 import showdown, { Converter } from 'showdown';
 import hljs from 'highlight.js';
 import he from 'he';
-import Twig from 'twig';
+import Twig, { twig } from 'twig';
 // @ts-ignore
 import showdownGhostFootnotes from 'showdown-ghost-footnotes';
 import Slice from './Slice';
@@ -58,13 +58,23 @@ export default class Renderer {
 			);
 		}
 
+		const parsedContent = this._renderMarkdown(content.content);
+
+		const config = {
+			...content,
+			config: this._config._config,
+			...this._sliceData,
+		};
+
+		// TODO: We need to:
+		//  1. parse the template,
+		//  2. render the content,
+		//  3. render the template
+
+		config.content = twig({ data: parsedContent }).render(config);
+
 		return new Promise(resolve => {
-			Twig.renderFile(file, {
-				...content,
-				content: this._renderMarkdown(content.content),
-				config: this._config._config,
-				...this._sliceData,
-			}, (err, html) => {
+			Twig.renderFile(file, config, (err, html) => {
 				if (!err)
 					return resolve(html);
 
@@ -177,8 +187,6 @@ export default class Renderer {
 					const handle = `__slice_${name}_${sliceIndexes[name]}`;
 
 					this._sliceData[handle] = Parse.content(full).data[name];
-
-					console.log(handle);
 
 					text = text.replace(
 						full,

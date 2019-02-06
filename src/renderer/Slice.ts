@@ -45,10 +45,10 @@ export default function Slice (Twig : any) {
 
 			const template = this;
 
-			this.slices[token.name] = function (key : string) {
+			this.slices[token.name] = function (data : string) {
 				const sliceContext = {
 					...context,
-					[token.name]: context[key],
+					[token.name]: data,
 				};
 
 				return Twig.parseAsync.call(
