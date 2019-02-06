@@ -23,17 +23,17 @@ export default function Slice (Twig : any) {
 			if (token.fixed) {
 				const sliceContext = {
 					...context,
-					[token.name]: { url: '', alt: '' },
+					[token.name]: { src: 'https://source.unsplash.com/random/400x400', alt: 'Hello' },
 				};
 
-				console.log(token.output);
-
-				// FIXME: Not outputting anything, not erroring :(
 				return Twig.parseAsync.call(
 					this,
 					token.output,
 					sliceContext
-				);
+				).then((output : any) => ({
+					output,
+					chain,
+				}));
 			}
 
 			if (!this.hasOwnProperty('slices')) {
